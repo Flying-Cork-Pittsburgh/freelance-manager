@@ -8,6 +8,7 @@ Author: awoods
 Author URI: http://andrewwoods.net
 */
 
+require_once 'post-types/client.php';
 
 /**
 * Primary class for Freelance Manager plugin
