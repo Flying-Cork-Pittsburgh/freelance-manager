@@ -31,8 +31,6 @@ class Freelance_Manager
 	public function __construct() {
 		register_activation_hook( __FILE__, array( 'Freelance_Manager', 'activation' ) );
 		register_uninstall_hook( __FILE__, array( 'Freelance_Manager', 'uninstall' ) ); 
-
-		add_action( 'admin_head', array( $this, 'admin_head' ), 11 );
 	}
 
 
