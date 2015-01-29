@@ -1,5 +1,9 @@
 <?php
 
+
+add_action( 'init', 'client_init' );
+add_filter( 'post_updated_messages', 'client_updated_messages' );
+
 function client_init() {
 	register_post_type( 'client', array(
 		'labels'            => array(
@@ -21,14 +25,13 @@ function client_init() {
 		'hierarchical'      => true,
 		'show_ui'           => true,
 		'show_in_nav_menus' => true,
-		'supports'          => array( 'title', 'thumbnail', 'excerpt', 'editor' ),
+		'supports'          => array( 'title', 'thumbnail', 'excerpt', 'editor', 'custom-fields' ),
 		'has_archive'       => false,
 		'rewrite'           => true,
 		'query_var'         => true,
 	) );
 
 }
-add_action( 'init', 'client_init' );
 
 function client_updated_messages( $messages ) {
 	global $post;
@@ -54,4 +57,4 @@ function client_updated_messages( $messages ) {
 
 	return $messages;
 }
-add_filter( 'post_updated_messages', 'client_updated_messages' );
+

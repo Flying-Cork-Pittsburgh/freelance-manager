@@ -22,6 +22,8 @@ class Client_Admin  {
 	 */
 	public function __construct() {
 		add_action( 'manage_client_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
+		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
 		
 		add_filter( 'manage_posts_columns', array( $this, 'columns_data' ) );
 	}
@@ -67,9 +69,9 @@ class Client_Admin  {
 
 
 	/**
-	 * Modify the columns headers 
+	 * Modify the columns headers
 	 *
-	 * Update the column headers with new fields. This also determines the order the fields are rendered. 
+	 * Update the column headers with new fields. This also determines the order the fields are rendered.
 	 *
 	 * @since 0.1
 	 *
@@ -97,6 +99,90 @@ class Client_Admin  {
 		return $columns;
 	}
 
+
+	/**
+	 * Add an 'Overview' meta box to the post
+	 *
+	 *
+	 * @since 0.1
+	 *
+	 * @return void
+	 */
+	 public function overview_meta_box() {
+
+		$title = __('Overview');
+		$callback = 'overview_callback';
+		add_meta_box( 'fremgr-client-overview', $title, array( $this,  $callback), 'client' );
+
+	}
+
+	/**
+	 * Render the form of the metabax
+	 *
+	 *
+	 * @since 0.1
+	 *
+	 * @param  WP_Post $post the post object being saved
+	 * @return void
+	 */
+	public function overview_callback( $post ) {
+		$post_id = $post->ID;
+
+		$location_id = '_client_location';
+		$website_id  = '_client_website';
+		$phone_id    = '_client_phone';
+
+		$single = true;
+
+		$location = get_post_meta( $post_id, $location_id, $single );
+		$website  = get_post_meta( $post_id, $website_id, $single );
+		$phone    = get_post_meta( $post_id, $phone_id, $single );
+
+		error_log( 'location_id=' . $location_id . ' location=' . $location );
+
+		wp_nonce_field( 'fremgr_client_meta_box',  '_fremgr_client_overview_meta_box_nonce' );
+
+		?>
+		<div class="widefat">
+			<label for="<?php echo $location_id; ?>"><?php _e( 'Location', 'fremgr' );  ?></label>
+			<input type="text" id="<?php echo $location_id;  ?>" name="<?php echo $location_id; ?>"
+			value="<?php echo ( $location ) ? $location : ''; ?>">
+		</div>
+		<div class="widefat">
+			<label for="<?php echo $website_id; ?>"><?php _e( 'Website', 'fremgr' );  ?></label>
+			<input type="text" id="<?php echo $website_id;  ?>" name="<?php echo $website_id; ?>"
+			value="<?php echo ( $website ) ? $website : ''; ?>">
+		</div>
+		<div class="widefat">
+			<label for="<?php echo $phone_id; ?>"><?php _e( 'Phone Number', 'fremgr' );  ?></label>
+			<input type="text" id="<?php echo $phone_id;  ?>" name="<?php echo $phone_id; ?>"
+			value="<?php echo ( $phone ) ? $phone : ''; ?>">
+		</div>
+		 <?php
+	}
+
+	/**
+	 * Save the updated custom fields for the metabox
+	 *
+	 *
+	 * @since 0.1
+	 *
+	 * @param  int $post_id the ID of the Post being saved
+	 * @return void
+	 */
+	public function save_overview_meta_box( $post_id ) {
+
+		/* OK, its safe for us to save the data now. */
+
+		$location = sanitize_text_field( $_POST['_client_location'] );
+		$website  = sanitize_text_field( $_POST['_client_website'] );
+		$phone    = sanitize_text_field( $_POST['_client_phone'] );
+
+		// Update the meta fields.
+		update_post_meta( $post_id, '_client_location', $location );
+		update_post_meta( $post_id, '_client_website', $website );
+		update_post_meta( $post_id, '_client_phone', $phone );
+	}
 
 }
 
