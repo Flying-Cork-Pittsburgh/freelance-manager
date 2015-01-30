@@ -43,6 +43,13 @@ class Client_Admin  {
 	 */
 	public function column_content( $column_name, $post_id ) {
 
+		$location_id = '_client_location';
+		$website_id  = '_client_website';
+		$phone_id    = '_client_phone';
+
+		$single = true;
+
+
 		if ( 'thumbnail' == $column_name ) {
 			$default_thumbnail = 'default.png';
 			$default_image = plugin_dir_url( dirname( __FILE__ ) ) . $default_thumbnail;
@@ -56,11 +63,11 @@ class Client_Admin  {
 				echo '<img alt="default image" width="48" src="' . $default_image . '" />';
 			}
 		} else if ( 'location' == $column_name ) {
-			echo 'Seattle, WA';
+			echo $location = get_post_meta( $post_id, $location_id, $single );
 		} else if ( 'phone' == $column_name ) {
-			echo '206-555-1212';
+			echo get_post_meta( $post_id, $phone_id, $single );
 		} else if ( 'website' == $column_name ) {
-			$url = 'http://example.org';
+			$url = get_post_meta( $post_id, $website_id, $single );
 
 			echo '<a href="' . $url . '">' . $url . '</a>';
 		}
@@ -143,21 +150,37 @@ class Client_Admin  {
 		wp_nonce_field( 'fremgr_client_meta_box',  '_fremgr_client_overview_meta_box_nonce' );
 
 		?>
-		<div class="widefat">
+		<table class="form-table">
+		<tr>
+		<td>
 			<label for="<?php echo $location_id; ?>"><?php _e( 'Location', 'fremgr' );  ?></label>
+		</td>
+		<td>
 			<input type="text" id="<?php echo $location_id;  ?>" name="<?php echo $location_id; ?>"
 			value="<?php echo ( $location ) ? $location : ''; ?>">
-		</div>
-		<div class="widefat">
+		</td>
+		</tr>
+
+		<tr>
+		<td>
 			<label for="<?php echo $website_id; ?>"><?php _e( 'Website', 'fremgr' );  ?></label>
-			<input type="text" id="<?php echo $website_id;  ?>" name="<?php echo $website_id; ?>"
-			value="<?php echo ( $website ) ? $website : ''; ?>">
-		</div>
-		<div class="widefat">
+		</td>
+		<td>
+			<input type="url" id="<?php echo $website_id;  ?>" name="<?php echo $website_id; ?>"
+			value="<?php echo ( $website ) ? $website : ''; ?>" required >
+		</td>
+		</tr>
+
+		<tr>
+		<td>
 			<label for="<?php echo $phone_id; ?>"><?php _e( 'Phone Number', 'fremgr' );  ?></label>
-			<input type="text" id="<?php echo $phone_id;  ?>" name="<?php echo $phone_id; ?>"
+		</td>
+		<td>
+			<input type="tel" id="<?php echo $phone_id;  ?>" name="<?php echo $phone_id; ?>"
 			value="<?php echo ( $phone ) ? $phone : ''; ?>">
-		</div>
+		</td>
+		</tr>
+		</table> 
 		 <?php
 	}
 
