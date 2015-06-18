@@ -239,6 +239,12 @@ class Client_Admin  {
 	 */
 	public function save_overview_meta_box( $post_id ) {
 		$post = get_post($post_id);
+		$location = '';
+		$website = '';
+		$phone = '';
+		$person = '';
+		$email = '';
+
 		/* OK, its safe for us to save the data now. */
 
 		if ( isset( $_POST['_client_location'] ) ){
