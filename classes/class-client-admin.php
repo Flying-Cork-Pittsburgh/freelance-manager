@@ -2,7 +2,7 @@
 /**
 * Manage the admin dashboard with respect to the Client CPT (custom post type)
 *
-* Create a custom user experience for the the Client CPT. This includes add columns 
+* Create a custom user experience for the the Client CPT. This includes add columns
 * to the list of Clients
 *
 *
@@ -24,21 +24,21 @@ class Client_Admin  {
 		add_action( 'manage_client_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
-		
+
 		add_filter( 'manage_posts_columns', array( $this, 'columns_data' ) );
 	}
 
 	/**
 	 * Display the content of Client custom fields
 	 *
-	 * Render the content of custom fields for the Client CPT.  
+	 * Render the content of custom fields for the Client CPT.
 	 *
 	 * @since 0.1
 	 * @uses {wp_get_attachment_image_src}
 	 * @uses {get_post_thumbnail_id}
 	 *
-	 * @param  string $column_name 
-	 * @param  int $post_id 
+	 * @param  string $column_name
+	 * @param  int $post_id
 	 * @return void
 	 */
 	public function column_content( $column_name, $post_id ) {
@@ -57,7 +57,7 @@ class Client_Admin  {
 			$post_thumbnail_id = get_post_thumbnail_id( $post_id );
 			if ( $post_thumbnail_id ) {
 				$post_thumbnail_img = wp_get_attachment_image_src( $post_thumbnail_id, 'thumbnail' );
-				
+
 				echo '<img alt="client logo" width="48" src="' . $post_thumbnail_img[0] . '" />';
 			} else {
 				echo '<img alt="default image" width="48" src="' . $default_image . '" />';
