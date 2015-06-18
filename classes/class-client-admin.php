@@ -138,12 +138,21 @@ class Client_Admin  {
 		$location_id = '_client_location';
 		$website_id  = '_client_website';
 		$phone_id    = '_client_phone';
+		$sha1_id     = '_client_sha1';
+
+		$contact_person_id  = '_client_contact_person';
+		$contact_email_id   = '_client_contact_email';
+
 
 		$single = true;
 
 		$location = get_post_meta( $post_id, $location_id, $single );
 		$website  = get_post_meta( $post_id, $website_id, $single );
 		$phone    = get_post_meta( $post_id, $phone_id, $single );
+		$sha1     = get_post_meta( $post_id, $sha1_id, $single );
+
+		$contact_person = get_post_meta( $post_id, $contact_person_id, $single );
+		$contact_email  = get_post_meta( $post_id, $contact_email_id, $single );
 
 		error_log( 'location_id=' . $location_id . ' location=' . $location );
 
@@ -151,6 +160,16 @@ class Client_Admin  {
 
 		?>
 		<table class="form-table">
+		<tr>
+		<td>
+			<label for="<?php echo $sha1_id; ?>"><?php _e( 'SHA1', 'fremgr' );  ?></label>
+		</td>
+		<td>
+			<strong id="<?php echo $sha1_id;  ?>"><?php
+			echo ( $sha1 ) ? $sha1 : '';
+			?></strong>
+		</td>
+		</tr>
 		<tr>
 		<td>
 			<label for="<?php echo $location_id; ?>"><?php _e( 'Location', 'fremgr' );  ?></label>
@@ -180,13 +199,38 @@ class Client_Admin  {
 			value="<?php echo ( $phone ) ? $phone : ''; ?>">
 		</td>
 		</tr>
-		</table> 
+
+		<tr>
+		<td>
+			<label for="<?php echo $contact_person_id; ?>"><?php _e( 'Contact Person', 'fremgr' );  ?></label>
+		</td>
+		<td>
+			<input type="text"
+			id="<?php echo $contact_person_id; ?>"
+			name="<?php echo $contact_person_id; ?>"
+			value="<?php echo ( $contact_person ) ? $contact_person : ''; ?>">
+		</td>
+		</tr>
+
+		<tr>
+		<td>
+			<label for="<?php echo $contact_email_id; ?>"><?php
+			_e( 'Contact Email', 'fremgr' );
+			?></label>
+		</td>
+		<td>
+			<input type="email"
+			id="<?php echo $contact_email_id; ?>"
+			name="<?php echo $contact_email_id; ?>"
+			value="<?php echo ( $contact_email ) ? $contact_email : ''; ?>">
+		</td>
+		</tr>
+		</table>
 		 <?php
 	}
 
 	/**
-	 * Save the updated custom fields for the metabox
-	 *
+	 * Generate a SHA-1 and save the updated custom fields for the metabox
 	 *
 	 * @since 0.1
 	 *
@@ -194,17 +238,42 @@ class Client_Admin  {
 	 * @return void
 	 */
 	public function save_overview_meta_box( $post_id ) {
-
+		$post = get_post($post_id);
 		/* OK, its safe for us to save the data now. */
 
-		$location = sanitize_text_field( $_POST['_client_location'] );
-		$website  = sanitize_text_field( $_POST['_client_website'] );
-		$phone    = sanitize_text_field( $_POST['_client_phone'] );
+		if ( isset( $_POST['_client_location'] ) ){
+			$location = sanitize_text_field( $_POST['_client_location'] );
+			update_post_meta( $post_id, '_client_location', $location );
+		}
+		if ( isset( $_POST['_client_website']) ){
+			$website  = sanitize_text_field( $_POST['_client_website'] );
+			update_post_meta( $post_id, '_client_website', $website );
+		}
+		if ( isset($_POST['_client_phone']) ) {
+			$phone    = sanitize_text_field( $_POST['_client_phone'] );
+			update_post_meta( $post_id, '_client_phone', $phone );
+		}
 
-		// Update the meta fields.
-		update_post_meta( $post_id, '_client_location', $location );
-		update_post_meta( $post_id, '_client_website', $website );
-		update_post_meta( $post_id, '_client_phone', $phone );
+		if ( isset($_POST['_client_contact_person']) ) {
+			$person = sanitize_text_field( $_POST['_client_contact_person'] );
+			update_post_meta( $post_id, '_client_contact_person', $person );
+		}
+
+		if ( isset($_POST['_client_contact_email']) ) {
+			$email = sanitize_text_field( $_POST['_client_contact_email'] );
+			update_post_meta( $post_id, '_client_contact_email', $email );
+		}
+
+		if ( $post_id && $post->post_title && $website && $person && $email ) {
+			// The sha1 isn't controlled by the user.
+			// It's generated for them.
+			// These fields are use to prevent guessability and
+			// ensure uniqueness across clients
+			$value = $post_id . $post->post_title . $website . $person . $email;
+			$sha1 = sha1( $value );
+			update_post_meta( $post_id, '_client_sha1', $sha1 );
+		}
+
 	}
 
 }
