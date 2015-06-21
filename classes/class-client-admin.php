@@ -25,7 +25,7 @@ class Client_Admin  {
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
 
-		add_filter( 'manage_posts_columns', array( $this, 'columns_data' ) );
+		add_filter( 'manage_client_posts_columns', array( $this, 'columns_data' ) );
 	}
 
 	/**
