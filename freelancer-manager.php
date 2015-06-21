@@ -9,6 +9,7 @@ Author URI: http://andrewwoods.net
 */
 
 require_once 'post-types/client.php';
+require_once 'post-types/message.php';
 
 /**
 * Primary class for Freelance Manager plugin
@@ -96,10 +97,6 @@ function fremgr_autoloader( $class_name ) {
 
     if ( file_exists( $file_path ) ) {
         include_once $file_path;
-
-        if ( WP_DEBUG ) {
-            error_log( 'fremgr_autoloader loaded filename=' . $file_path );
-        }
     }
 
 }
@@ -109,4 +106,5 @@ spl_autoload_register( 'fremgr_autoloader' );
 
 $freelance_manager = Freelance_Manager::get_instance();
 $client_admin = new Client_Admin();
+$message_admin = new Message_Admin();
 
