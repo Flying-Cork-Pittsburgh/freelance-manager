@@ -11,10 +11,14 @@ Author URI: http://andrewwoods.net
 require_once 'post-types/client.php';
 require_once 'post-types/message.php';
 
+if ( defined('WP_CLI') && WP_CLI ) {
+	include_once __DIR__ . '/wpcli_client.php';
+}
+
 /**
 * Primary class for Freelance Manager plugin
 *
-* Track information about all of your clients from your wordpress dashboard 
+* Track information about all of your clients from your wordpress dashboard
 *
 *
 * @package  Freelance_Manager
@@ -25,14 +29,14 @@ class Freelance_Manager
 	private static $instance = null;
 
 	/**
-	 * constructor - manages all the actions and filters  
+	 * constructor - manages all the actions and filters
 	 *
 	 * @since 0.1
 	 * @return void
 	 */
 	public function __construct() {
 		register_activation_hook( __FILE__, array( 'Freelance_Manager', 'activation' ) );
-		register_uninstall_hook( __FILE__, array( 'Freelance_Manager', 'uninstall' ) ); 
+		register_uninstall_hook( __FILE__, array( 'Freelance_Manager', 'uninstall' ) );
 	}
 
 
