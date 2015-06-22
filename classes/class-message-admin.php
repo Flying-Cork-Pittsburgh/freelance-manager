@@ -75,7 +75,8 @@ class Message_Admin  {
 		$post_id = $post->ID;
 
 		$clients = $this->get_clients();
-
+		$default = ['ID' => 0, 'post_title' => '--default--' ];
+		array_unshift($clients, (object) $default);
 		$single = true;
 
 		$client_id = get_post_meta( $post_id, $this->client_id, $single );
