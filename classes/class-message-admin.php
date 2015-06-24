@@ -11,10 +11,15 @@
 */
 class Message_Admin  {
 
+	private $status_default = 'not_sent';
+
 	// Field IDs
 	private $client_id   = '_client_id';
 	private $subject     = '_message_subject';
+	private $status      = '_message_status';
+	private $actions     = '_message_actions';
 	private $clients     = [];
+	private $statuses    = [];
 
 	/**
 	 * Constructor
@@ -25,6 +30,9 @@ class Message_Admin  {
 	 *
 	 */
 	public function __construct() {
+		$this->statuses['not_sent'] = __( 'Not Sent' );
+		$this->statuses['sent'] = __( 'Sent' );
+
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
 		add_action( 'manage_message_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
@@ -81,6 +89,7 @@ class Message_Admin  {
 
 		$client_id = get_post_meta( $post_id, $this->client_id, $single );
 		$subject = get_post_meta( $post_id, $this->subject, $single );
+		$status = get_post_meta( $post_id, $this->status, $single );
 		$sha1 = sha1( 'Hello World' );
 
 		wp_nonce_field( 'fremgr_message_meta_box',  '_fremgr_message_overview_meta_box_nonce' );
@@ -107,6 +116,17 @@ class Message_Admin  {
 		<td>
 			<input type="text" id="<?php echo $this->subject;  ?>" name="<?php echo $this->subject; ?>"
 			value="<?php echo ( $subject ) ? $subject : ''; ?>">
+		</td>
+		</tr>
+
+		<tr>
+		<td>
+			<label for="<?php echo $this->status; ?>"><?php _e( 'Status', 'fremgr' );  ?></label>
+		</td>
+		<td><?php
+			$status = ( $status ) ? $status : $this->status_default;
+			$status_text = $this->statuses[ $status ];
+			echo $status_text; ?>
 		</td>
 		</tr>
 
@@ -139,6 +159,11 @@ class Message_Admin  {
 			update_post_meta( $post_id, $this->subject, $subject );
 		}
 
+		if ( isset( $_POST[ $this->status] ) ){
+			$status  = sanitize_text_field( $_POST[ $this->status ] );
+			update_post_meta( $post_id, $this->status, $status );
+		}
+
 	}
 
 
@@ -156,6 +181,8 @@ class Message_Admin  {
 		$myCustomColumns = array(
 			'subject' => __( 'Subject', 'fremgr' ),
 			'client' => __( 'Client', 'fremgr' ),
+			'message_status' => __( 'Status', 'fremgr' ),
+			'message_actions' => __( 'Actions', 'fremgr' ),
 		);
 		$columns = array_merge( $columns, $myCustomColumns );
 
@@ -200,7 +227,17 @@ class Message_Admin  {
 		} else if ( 'subject' == $column_name ) {
 			echo get_post_meta( $post_id, $this->subject, $single );
 
-		}
+		} else if ( 'message_status' == $column_name ) {
+			$code = get_post_meta( $post_id, $this->status, $single );
+			if ( empty( $code ) ) {
+				$code = $this->status_default;
+			}
+			echo $this->statuses[ $code ];
 
+		} else if ( 'message_actions' == $column_name ) {
+			 get_post_meta( $post_id, $this->subject, $single );
+			echo '<a href="#">Send</a> ';
+
+		}
 	}
 }
