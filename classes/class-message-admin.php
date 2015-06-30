@@ -12,6 +12,7 @@
 class Message_Admin  {
 
 	private $status_default = 'not_sent';
+	private $client_default = 'Client not specified';
 
 	// Field IDs
 	private $client_id   = '_client_id';
@@ -36,7 +37,21 @@ class Message_Admin  {
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
 		add_action( 'manage_message_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
+        add_action( 'wp_ajax_message_send', array( $this, 'message_send' ) );
+
 		add_filter( 'manage_message_posts_columns', array( $this, 'columns_headings' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'ajax_js' ) );
+	}
+
+	/**
+	* Enqueues the administrative ajax file
+	*
+	* @param String $one a necessary parameter
+	* @param String optional $two an optional value
+	* @return void
+	*/
+	public function ajax_js( $hook ) {
+		wp_enqueue_script( 'fremgr-ajax', plugin_dir_url( __DIR__ ) . 'js/ajax.js' );
 	}
 
 	/**
@@ -221,7 +236,7 @@ class Message_Admin  {
 					echo $clients[ $client_id ]->post_title;
 				}
 			} else {
-				echo "Client not specified";
+				echo $this->client_default;
 			}
 
 		} else if ( 'subject' == $column_name ) {
@@ -235,9 +250,85 @@ class Message_Admin  {
 			echo $this->statuses[ $code ];
 
 		} else if ( 'message_actions' == $column_name ) {
-			 get_post_meta( $post_id, $this->subject, $single );
-			echo '<a href="#">Send</a> ';
 
+			$client_id = get_post_meta( $post_id, $this->client_id, $single );
+			if ( $client_id ) {
+				$clients = $this->get_clients();
+
+				$client_admin = new Client_Admin();
+				$url_field = $client_admin->get_field('website');
+
+				$website = get_post_meta( $client_id, $url_field, $single );
+				$action = 'message_send';
+
+				$data_attrs = '';
+				$data_attrs .= ' data-id="' . $post_id . '" ';
+				$data_attrs .= ' data-action="' . $action . '" ';
+				$data_attrs .= ' data-website="' . $website . '" ';
+
+				echo '<button ' . $data_attrs . ' class="message_send">Send</button>';
+			}
 		}
+	}
+
+	/**
+	* Look up the content for the current request and send it to the client dashboard
+	*
+	* @param int $_POST['id']  the Post ID for the message.
+	* @param String $_POST['website'] The client website - must be a wordpress
+	* site using the Freelance Site
+	* @return void
+	*/
+	public function message_send() {
+		$website = strip_tags( $_POST['website'] );
+		$id      = intval( $_POST['id'] );
+
+		$url = $website . '/wp-admin/admin-ajax.php';
+
+		wp_reset_postdata();
+		//
+		// Look up the message content for this $id
+		//
+		$query_args = 'p=' . $id. '&post_type=message';
+		$query2 = new WP_Query( $query_args );
+		$content = '';
+
+		if ( $query2->have_posts() ) {
+			while ( $query2->have_posts() ) {
+				$query2->the_post();
+				$content = get_the_content();
+			}
+		} else {
+			$data = array('message' => 'There are no posts for this ID');
+
+			wp_send_json_error( $data );
+		}
+
+		// Restore original Post Data
+		wp_reset_postdata();
+
+		$data = array(
+			'action' => 'new_message',
+			'id' => $id,
+			'message' => $content,
+			'client_sha' => 'd2a04d71301a8915217dd5faf81d12cffd6cd958',
+			'manager_sha' => 'f2e048910a8c617d70ccac9d60cca84c77a960c09'
+		);
+
+		$args = array();
+		$args['method'] = 'POST';
+		$args['user-agent'] = 'Freelance-Manager/' . FREMGR_VERSION;
+		$args['body'] = $data;
+
+		$response = wp_remote_post( $url, $args );
+
+		$data = wp_remote_retrieve_body( $response );
+		if ( 200 == $response['response']['code'] ) {
+			wp_send_json_success( $data );
+		} else {
+			error_log( 'data=' . print_r( $data, true ) );
+			wp_send_json_error( $data );
+		}
+
 	}
 }
