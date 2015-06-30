@@ -8,6 +8,8 @@ Author: awoods
 Author URI: http://andrewwoods.net
 */
 
+define('FREMGR_VERSION', 0.1);
+
 require_once 'post-types/client.php';
 require_once 'post-types/message.php';
 
