@@ -28,6 +28,33 @@ class Client_Admin  {
 		add_filter( 'manage_client_posts_columns', array( $this, 'columns_data' ) );
 	}
 
+	public function get_field( $field ) {
+		switch ( $field ) {
+		case 'location':
+			return '_client_location';
+			break;
+		case 'website':
+			return '_client_website';
+			break;
+		case 'phone':
+			return '_client_phone';
+			break;
+		case 'sha':
+			return '_client_sha1';
+			break;
+		case 'contact_name':
+			return '_client_contact_person';
+			break;
+		case 'contact_email':
+			return '_client_contact_email';
+			break;
+		default:
+			return false;
+			break;
+		}
+
+	}
+
 	/**
 	 * Display the content of Client custom fields
 	 *
@@ -43,9 +70,9 @@ class Client_Admin  {
 	 */
 	public function column_content( $column_name, $post_id ) {
 
-		$location_id = '_client_location';
-		$website_id  = '_client_website';
-		$phone_id    = '_client_phone';
+		$location_id = $this->get_field( 'location' );
+		$website_id  = $this->get_field( 'website' );
+		$phone_id    = $this->get_field( 'phone' );
 
 		$single = true;
 
@@ -135,13 +162,13 @@ class Client_Admin  {
 	public function overview_callback( $post ) {
 		$post_id = $post->ID;
 
-		$location_id = '_client_location';
-		$website_id  = '_client_website';
-		$phone_id    = '_client_phone';
-		$sha1_id     = '_client_sha1';
+		$location_id = $this->get_field( 'location' );
+		$website_id  = $this->get_field( 'website' );
+		$phone_id    = $this->get_field( 'phone' );
+		$sha1_id     = $this->get_field( 'sha' );
 
-		$contact_person_id  = '_client_contact_person';
-		$contact_email_id   = '_client_contact_email';
+		$contact_person_id  = $this->get_field('contact_name');
+		$contact_email_id   = $this->get_field('contact_email');
 
 
 		$single = true;
