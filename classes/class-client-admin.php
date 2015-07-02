@@ -266,49 +266,86 @@ class Client_Admin  {
 	 */
 	public function save_overview_meta_box( $post_id ) {
 		$post = get_post($post_id);
-		$location = '';
-		$website = '';
-		$phone = '';
-		$person = '';
-		$email = '';
+		$data = array();
+		$data['location'] = '';
+		$data['website'] = '';
+		$data['phone'] = '';
+		$data['person'] = '';
+		$data['email'] = '';
+		$data['sha1'] = '';
 
 		/* OK, its safe for us to save the data now. */
 
 		if ( isset( $_POST['_client_location'] ) ){
-			$location = sanitize_text_field( $_POST['_client_location'] );
-			update_post_meta( $post_id, '_client_location', $location );
+			$data['location'] = sanitize_text_field( $_POST['_client_location'] );
 		}
 		if ( isset( $_POST['_client_website']) ){
-			$website  = sanitize_text_field( $_POST['_client_website'] );
-			update_post_meta( $post_id, '_client_website', $website );
+			$data['website']  = sanitize_text_field( $_POST['_client_website'] );
 		}
 		if ( isset($_POST['_client_phone']) ) {
-			$phone    = sanitize_text_field( $_POST['_client_phone'] );
-			update_post_meta( $post_id, '_client_phone', $phone );
+			$data['phone']    = sanitize_text_field( $_POST['_client_phone'] );
 		}
 
 		if ( isset($_POST['_client_contact_person']) ) {
-			$person = sanitize_text_field( $_POST['_client_contact_person'] );
-			update_post_meta( $post_id, '_client_contact_person', $person );
+			$data['person'] = sanitize_text_field( $_POST['_client_contact_person'] );
 		}
 
 		if ( isset($_POST['_client_contact_email']) ) {
-			$email = sanitize_text_field( $_POST['_client_contact_email'] );
-			update_post_meta( $post_id, '_client_contact_email', $email );
+			$data['email'] = sanitize_text_field( $_POST['_client_contact_email'] );
 		}
 
-		if ( $post_id && $post->post_title && $website && $person && $email ) {
-			// The sha1 isn't controlled by the user.
-			// It's generated for them.
-			// These fields are use to prevent guessability and
-			// ensure uniqueness across clients
-			$value = $post_id . $post->post_title . $website . $person . $email;
-			$sha1 = sha1( $value );
-			update_post_meta( $post_id, '_client_sha1', $sha1 );
+		if ( $post_id && $post->post_title &&
+			$data['website'] && $data['person'] && $data['email'] ) {
+
+			$data['sha1'] = $this->create_sha(
+				$post_id,
+				$post->post_title,
+				$data['website'],
+				$data['person'],
+				$data['email']
+			);
 		}
 
+		$this->update_meta( $post_id, $data );
 	}
 
+	/**
+	 * Create a SHA1 string to uniquely identify the client
+	 *
+	 * Describe your function The sha1 isn't controlled by the user. It's generated for them.
+	 * These fields are use to prevent guessability and ensure uniqueness across clients
+	 *
+	 * @param int $post_id
+	 * @param string $post_title
+	 * @param string $website
+	 * @param string $person
+	 * @param string $email
+	 * @return string
+	 */
+	public function create_sha( $post_id, $post_title, $website, $person, $email ){
+		$value = $post_id . $post_title . $website . $person . $email;
+		return sha1( $value );
+	}
+
+	/**
+	 * Update the post meta with the $data array
+	 *
+	 * Take a pre-sanitized array of meta values and update their post meta values
+	 *
+	 * @param int $post_id ID of the post
+	 * @param array $data
+	 * @return void
+	 */
+	public function update_meta( $post_id, $data ) {
+
+		update_post_meta( $post_id, '_client_location', $data['location'] );
+		update_post_meta( $post_id, '_client_website', $data['website'] );
+		update_post_meta( $post_id, '_client_phone', $data['phone'] );
+		update_post_meta( $post_id, '_client_contact_person', $data['person'] );
+		update_post_meta( $post_id, '_client_contact_email', $data['email'] );
+		update_post_meta( $post_id, '_client_sha1', $data['sha1'] );
+
+	}
 }
 
 
