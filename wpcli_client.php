@@ -7,6 +7,17 @@
 class Client_Command extends WP_CLI_Command {
 
     /**
+     * @var string $object_type WordPress' expected name for the object.
+     */
+	protected $obj_type = 'client';
+
+
+    /**
+     * @var string $obj_fields WordPress' expected name for the object.
+     */
+	protected $obj_fields = 'ID,post_title,post_name,post_status,post_date,post_modified';
+
+    /**
      * Add a Client.
      *
      * ## OPTIONS
@@ -89,6 +100,39 @@ class Client_Command extends WP_CLI_Command {
     }
 
 	/**
+     * list all clients.
+     *
+     * ## OPTIONS
+     *
+     *
+     * ## EXAMPLES
+     *
+     *     wp client list [--fields=<fields>]
+     *
+     * @synopsis [--fields=<fields>]
+	 *
+	 * @subcommand list
+     */
+    function listall( $args, $assoc_args = array() ) {
+        $formatter = $this->get_formatter( $assoc_args );
+
+		error_log( print_r( $formatter, true ) );
+
+        $defaults = array(
+            'posts_per_page' => -1,
+            'post_status'    => 'any',
+            'post_type'      => 'client',
+        );
+        $query_args = array_merge( $defaults, $assoc_args );
+
+
+		$query = new WP_Query( $query_args );
+		$formatter->display_items( $query->posts );
+
+    }
+
+
+	/**
      * Delete a client.
      *
      * ## OPTIONS
@@ -151,6 +195,26 @@ class Client_Command extends WP_CLI_Command {
         WP_CLI::success( "todo: Retrieved $name!" );
     }
 
+
+    /**
+     * Get Formatter object based on supplied parameters.
+     *
+     * @param array $assoc_args Parameters passed to command. Determines formatting.
+     * @return \WP_CLI\Formatter
+     */
+    protected function get_formatter( &$assoc_args ) {
+
+        if ( ! empty( $assoc_args['fields'] ) ) {
+            if ( is_string( $assoc_args['fields'] ) ) {
+                $fields = explode( ',', $assoc_args['fields'] );
+            } else {
+                $fields = $assoc_args['fields'];
+            }
+        } else {
+            $fields = $this->obj_fields;
+        }
+        return new \WP_CLI\Formatter( $assoc_args, $fields, $this->obj_type );
+    }
 
 }
 
