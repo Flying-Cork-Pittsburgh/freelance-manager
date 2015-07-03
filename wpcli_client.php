@@ -142,15 +142,23 @@ class Client_Command extends WP_CLI_Command {
      *
      * ## EXAMPLES
      *
-     *     wp client delete Newman
+     *     wp client delete 5
      *
-     * @synopsis <name>
+     * @synopsis <id>
      */
     function delete( $args, $assoc_args ) {
-        list( $name ) = $args;
+        list( $post_id ) = $args;
 
-        // Print a success message
-        WP_CLI::success( "todo: Deleted $name!" );
+		$post = wp_delete_post( $post_id, true );
+		if ( $post === false ) {
+			WP_CLI::error( "Could not delete post" );
+			return;
+		} else {
+			$client_admin = new Client_Admin();
+			$client_admin->delete_meta( $post_id );
+
+			WP_CLI::success( "Deleted post with ID $post_id and it's meta!" );
+		}
     }
 
     /**

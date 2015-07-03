@@ -346,6 +346,27 @@ class Client_Admin  {
 		update_post_meta( $post_id, '_client_sha1', $data['sha1'] );
 
 	}
+
+
+	/**
+	 * Remove the post meta with the $data array
+	 *
+	 * Take a pre-sanitized array of meta values and update their post meta values
+	 *
+	 * @param int $post_id ID of the post
+	 * @param array $data
+	 * @return void
+	 */
+	public function delete_meta( $post_id ) {
+
+		delete_post_meta( $post_id, '_client_location' );
+		delete_post_meta( $post_id, '_client_website' );
+		delete_post_meta( $post_id, '_client_phone' );
+		delete_post_meta( $post_id, '_client_contact_person' );
+		delete_post_meta( $post_id, '_client_contact_email' );
+		delete_post_meta( $post_id, '_client_sha1' );
+
+	}
 }
 
 
