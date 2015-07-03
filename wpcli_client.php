@@ -61,42 +61,39 @@ class Client_Command extends WP_CLI_Command {
 
 		$client_admin = new Client_Admin();
 
-		error_log( 'assoc_args=' . print_r( $assoc_args, true ) );
-
 		if ( isset( $assoc_args['location'] ) ){
 			$data['location'] = sanitize_text_field( $assoc_args['location'] );
 		}
-		if ( isset( $assoc_args['url']) ){
-			$data['website']  = sanitize_text_field( $assoc_args['url'] );
+		if ( isset( $assoc_args['website']) ){
+			$data['website']  = sanitize_text_field( $assoc_args['website'] );
 		}
-		if ( isset($assoc_args['tel']) ) {
-			$data['phone']    = sanitize_text_field( $assoc_args['tel'] );
-		}
-
-		if ( isset($assoc_args['fullname']) ) {
-			$data['person'] = sanitize_text_field( $assoc_args['fullname'] );
+		if ( isset($assoc_args['phone']) ) {
+			$data['phone']    = sanitize_text_field( $assoc_args['phone'] );
 		}
 
-		if ( isset($assoc_args['email']) ) {
-			$data['email'] = sanitize_text_field( $assoc_args['email'] );
+		if ( isset($assoc_args['contact_name']) ) {
+			$data['contact_name'] = sanitize_text_field( $assoc_args['contact_name'] );
+		}
+
+		if ( isset($assoc_args['contact_email']) ) {
+			$data['contact_email'] = sanitize_text_field( $assoc_args['contact_email'] );
 		}
 
 		if ( $post_id && $name &&
-			$data['website'] && $data['person'] && $data['email'] ) {
+			$data['website'] && $data['contact_name'] && $data['contact_email'] ) {
 
-			$data['sha1'] = $this->create_sha(
+			$data['sha1'] = $client_admin->create_sha(
 				$post_id,
 				$name,
 				$data['website'],
-				$data['person'],
-				$data['email']
+				$data['contact_name'],
+				$data['contact_email']
 			);
 		}
 
 		$client_admin->update_meta( $post_id, $data );
 
-        // Print a success message
-        WP_CLI::success( "todo: Added $name!" );
+        WP_CLI::success( "Added $name!" );
     }
 
 	/**
