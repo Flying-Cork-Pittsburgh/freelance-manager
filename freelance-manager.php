@@ -112,5 +112,8 @@ spl_autoload_register( 'fremgr_autoloader' );
 
 $freelance_manager = Freelance_Manager::get_instance();
 $client_admin = new Client_Admin();
+$client_admin->init();
+
 $message_admin = new Message_Admin();
+$message_admin->init();
 

@@ -34,13 +34,16 @@ class Message_Admin  {
 		$this->statuses['not_sent'] = __( 'Not Sent' );
 		$this->statuses['sent'] = __( 'Sent' );
 
+	}
+
+	public function init() {
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
 		add_action( 'manage_message_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
         add_action( 'wp_ajax_message_send', array( $this, 'message_send' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'ajax_js' ) );
 
 		add_filter( 'manage_message_posts_columns', array( $this, 'columns_headings' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'ajax_js' ) );
 	}
 
 	/**

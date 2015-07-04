@@ -21,12 +21,15 @@ class Client_Admin  {
 	 * @return void
 	 */
 	public function __construct() {
+	}
+
+	public function init() {
 		add_action( 'manage_client_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
-
 		add_filter( 'manage_client_posts_columns', array( $this, 'columns_data' ) );
 	}
+
 
 	public function get_field( $field ) {
 		switch ( $field ) {
