@@ -158,26 +158,102 @@ class Client_Command extends WP_CLI_Command {
 		}
     }
 
-    /**
-     * Update a client.
-     *
-     * ## OPTIONS
-     *
-     * <name>
-     * : The client you want to update.
-     *
-     * ## EXAMPLES
-     *
-     *     wp client update Newman
-     *
-     * @synopsis <name>
-     */
-    function update( $args, $assoc_args ) {
-        list( $name ) = $args;
+	/**
+	 * Update a client by id.
+	 *
+	 * ## OPTIONS
+	 *
+	 *  <id>
+	 * :   The numeric id of the Post
+	 *
+	 * [--slug=<slug>]
+	 * :   The slug of the client you want to update.
+	 *
+	 * [--location=<location>]
+	 * :   the city where they live. Include the state if in the US.
+	 *
+	 * [--website=<url>]
+	 * :   the URL of their website e.g. http://example.com
+	 *
+	 * [--phone=<tel>]
+	 * :   The telephone number of the client
+	 *
+	 * [--contact-name=<fullname>]
+	 * :   The first and last name of the person at the client office
+	 *
+	 * [--contact-email=<email>]
+	 * :   The email of the contact person
+	 *
+	 * ## EXAMPLES
+	 *
+	 * wp client update 5 --slug=new-slug
+	 *
+	 */
+	function update( $args, $assoc_args ) {
+		if ( ! ctype_digit( $args[0] ) ) {
+			WP_CLI::error( "Doesn't look like a post ID!" );
+			return;
+		}
+		list( $post_id ) = $args;
 
-        // Print a success message
-        WP_CLI::success( "todo: Updated $name!" );
-    }
+
+		$client_admin = new Client_Admin();
+		$single = true;
+		$data = array();
+		$post = array();
+
+
+		$post['ID'] = $post_id;
+		$post['post_type'] = 'client';
+		$post['post_author'] = '1';
+		if ( isset( $assoc_args['slug'] ) ) {
+			$post['post_name'] = sanitize_title( $assoc_args['slug'] );
+		}
+
+		$post_id = wp_update_post( $post, true );
+		if( is_wp_error( $post_id ) ) {
+			WP_CLI::error( $post_id->get_error_message() );
+			return;
+		} else {
+			WP_CLI::success( "Updated Client Post $post_id!" );
+		}
+
+
+		if ( isset( $assoc_args['location'] ) ){
+			$data['location'] = sanitize_text_field( $assoc_args['location'] );
+		}
+		if ( isset( $assoc_args['website']) ){
+			$data['website']  = sanitize_text_field( $assoc_args['website'] );
+		}
+		if ( isset($assoc_args['phone']) ) {
+			$data['phone']	  = sanitize_text_field( $assoc_args['phone'] );
+		}
+		if ( isset($assoc_args['contact_name']) ) {
+			$data['contact_name'] = sanitize_text_field( $assoc_args['contact_name'] );
+		}
+		if ( isset($assoc_args['contact_email']) ) {
+			$data['contact_email'] = sanitize_text_field( $assoc_args['contact_email'] );
+		}
+		if ( $post_id && isset($data['slug']) && isset( $data['website'] )
+			&& isset( $data['contact_name'] ) && isset( $data['contact_email'] ) ) {
+
+			$data['sha1'] = $client_admin->create_sha(
+				$post_id,
+				$name,
+				$data['website'],
+				$data['contact_name'],
+				$data['contact_email']
+			);
+		}
+
+		if ( $data ) {
+			$updated = $client_admin->update_meta( $post_id, $data );
+			if ( $updated ) {
+				WP_CLI::success( "Updated meta for $post_id!" );
+			}
+		}
+
+	}
 
     /**
      * Get a client.
