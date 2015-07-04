@@ -340,22 +340,17 @@ class Client_Admin  {
 	 * @return void
 	 */
 	public function update_meta( $post_id, $data ) {
-		error_log( 'update_meta  data=' . print_r( $data, true ) );
-		$location_id = $this->get_field( 'location' );
-		$website_id  = $this->get_field( 'website' );
-		$phone_id    = $this->get_field( 'phone' );
-		$sha1_id     = $this->get_field( 'sha' );
+		$updated = 0;
 
-		$contact_person_id  = $this->get_field('contact_name');
-		$contact_email_id   = $this->get_field('contact_email');
+		foreach ( $data AS $field => $value ) {
+			$field_id = $this->get_field( $field );
+			$res = update_post_meta( $post_id, $field_id, $value );
+			if ( $res ) {
+				$updated++;
+			}
+		}
 
-		update_post_meta( $post_id, $location_id, $data['location'] );
-		update_post_meta( $post_id, $website_id, $data['website'] );
-		update_post_meta( $post_id, $phone_id, $data['phone'] );
-		update_post_meta( $post_id, $contact_person_id, $data['contact_name'] );
-		update_post_meta( $post_id, $contact_email_id, $data['contact_email'] );
-		update_post_meta( $post_id, $sha1_id, $data['sha1'] );
-
+		return $updated;
 	}
 
 
