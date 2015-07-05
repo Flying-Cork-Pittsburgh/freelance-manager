@@ -23,7 +23,7 @@ define( 'WP_DEBUG', true );
 // These tests will DROP ALL TABLES in the database with the prefix named below.
 // DO NOT use a production database or one that is shared with something else.
 
-define( 'DB_NAME', 'fremgr_phpunit_test' );
+define( 'DB_NAME', 'fremgr_tests' );
 define( 'DB_USER', 'root' );
 define( 'DB_PASSWORD', 'awoods' );
 define( 'DB_HOST', 'localhost' );
