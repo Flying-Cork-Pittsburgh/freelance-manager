@@ -6,36 +6,36 @@
  */
 class Client_Command extends WP_CLI_Command {
 
-    /**
-     * @var string $object_type WordPress' expected name for the object.
-     */
+	/**
+	 * @var string $object_type WordPress' expected name for the object.
+	 */
 	protected $obj_type = 'client';
 
 
-    /**
-     * @var string $obj_fields WordPress' expected name for the object.
-     */
+	/**
+	 * @var string $obj_fields WordPress' expected name for the object.
+	 */
 	protected $obj_fields = 'ID,post_title,post_name,post_status,post_date,post_modified';
 
-    /**
-     * Add a Client.
-     *
-     * ## OPTIONS
-     *
-     * <name>
-     * :   The name of the Client
-     *
-     * <slug>
-     * :   The unique value that can used in an URL.
-     *
-     * ## EXAMPLES
+	/**
+	 * Add a Client.
 	 *
-     * wp client add Company
-     * wp client add 'Company Name' [company-name]
-     *
-     * @synopsis <name> [<slug>] [--location=<location>] [--website=<url>] [--phone=<tel>] [--contact_name=<fullname>] [--contact_email=<email>]
-     */
-    function add( $args, $assoc_args = array() ) {
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * :   The name of the Client
+	 *
+	 * <slug>
+	 * :   The unique value that can used in an URL.
+	 *
+	 * ## EXAMPLES
+	 *
+	 * wp client add Company
+	 * wp client add 'Company Name' [company-name]
+	 *
+	 * @synopsis <name> [<slug>] [--location=<location>] [--website=<url>] [--phone=<tel>] [--contact_name=<fullname>] [--contact_email=<email>]
+	 */
+	function add( $args, $assoc_args = array() ) {
 		$data = array();
 		$data['location'] = '';
 		$data['website'] = '';
@@ -93,58 +93,58 @@ class Client_Command extends WP_CLI_Command {
 
 		$client_admin->update_meta( $post_id, $data );
 
-        WP_CLI::success( "Added $name!" );
-    }
+		WP_CLI::success( "Added $name!" );
+	}
 
 	/**
-     * list all clients.
-     *
-     * ## OPTIONS
-     *
-     *
-     * ## EXAMPLES
-     *
-     *     wp client list [--fields=<fields>]
-     *
-     * @synopsis [--fields=<fields>]
+	 * list all clients.
+	 *
+	 * ## OPTIONS
+	 *
+	 *
+	 * ## EXAMPLES
+	 *
+	 *  wp client list [--fields=<fields>]
+	 *
+	 * @synopsis [--fields=<fields>]
 	 *
 	 * @subcommand list
-     */
-    function listall( $args, $assoc_args = array() ) {
-        $formatter = $this->get_formatter( $assoc_args );
+	 */
+	function listall( $args, $assoc_args = array() ) {
+		$formatter = $this->get_formatter( $assoc_args );
 
 		error_log( print_r( $formatter, true ) );
 
-        $defaults = array(
-            'posts_per_page' => -1,
-            'post_status'    => 'any',
-            'post_type'      => 'client',
-        );
-        $query_args = array_merge( $defaults, $assoc_args );
+		$defaults = array(
+			'posts_per_page' => -1,
+			'post_status'    => 'any',
+			'post_type'      => 'client',
+		);
+		$query_args = array_merge( $defaults, $assoc_args );
 
 
 		$query = new WP_Query( $query_args );
 		$formatter->display_items( $query->posts );
 
-    }
+	}
 
 
 	/**
-     * Delete a client.
-     *
-     * ## OPTIONS
-     *
-     * <name>
-     * : The client you want to remove.
-     *
-     * ## EXAMPLES
-     *
-     *     wp client delete 5
-     *
-     * @synopsis <id>
-     */
-    function delete( $args, $assoc_args ) {
-        list( $post_id ) = $args;
+	 * Delete a client.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : The client you want to remove.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp client delete 5
+	 *
+	 * @synopsis <id>
+	 */
+	function delete( $args, $assoc_args ) {
+		list( $post_id ) = $args;
 
 		$post = wp_delete_post( $post_id, true );
 		if ( $post === false ) {
@@ -156,14 +156,14 @@ class Client_Command extends WP_CLI_Command {
 
 			WP_CLI::success( "Deleted post with ID $post_id and it's meta!" );
 		}
-    }
+	}
 
 	/**
 	 * Update a client by id.
 	 *
 	 * ## OPTIONS
 	 *
-	 *  <id>
+	 * <id>
 	 * :   The numeric id of the Post
 	 *
 	 * [--slug=<slug>]
@@ -255,47 +255,47 @@ class Client_Command extends WP_CLI_Command {
 
 	}
 
-    /**
-     * Get a client.
-     *
-     * ## OPTIONS
-     *
-     * <name>
-     * : The client you want to retrieve.
-     *
-     * ## EXAMPLES
-     *
-     *     wp client get Newman
-     *
-     * @synopsis <name>
-     */
-    function get( $args, $assoc_args ) {
-        list( $name ) = $args;
+	/**
+	 * Get a client.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : The client you want to retrieve.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *  wp client get Newman
+	 *
+	 * @synopsis <name>
+	 */
+	function get( $args, $assoc_args ) {
+		list( $name ) = $args;
 
-        // Print a success message
-        WP_CLI::success( "todo: Retrieved $name!" );
-    }
+		// Print a success message
+		WP_CLI::success( "todo: Retrieved $name!" );
+	}
 
 
-    /**
-     * Get Formatter object based on supplied parameters.
-     *
-     * @param array $assoc_args Parameters passed to command. Determines formatting.
-     * @return \WP_CLI\Formatter
-     */
-    protected function get_formatter( &$assoc_args ) {
+	/**
+	 * Get Formatter object based on supplied parameters.
+	 *
+	 * @param array $assoc_args Parameters passed to command. Determines formatting.
+	 * @return \WP_CLI\Formatter
+	 */
+	protected function get_formatter( &$assoc_args ) {
 
-        if ( ! empty( $assoc_args['fields'] ) ) {
-            if ( is_string( $assoc_args['fields'] ) ) {
-                $fields = explode( ',', $assoc_args['fields'] );
-            } else {
-                $fields = $assoc_args['fields'];
-            }
-        } else {
-            $fields = $this->obj_fields;
-        }
-        return new \WP_CLI\Formatter( $assoc_args, $fields, $this->obj_type );
-    }
+		if ( ! empty( $assoc_args['fields'] ) ) {
+			if ( is_string( $assoc_args['fields'] ) ) {
+				$fields = explode( ',', $assoc_args['fields'] );
+			} else {
+				$fields = $assoc_args['fields'];
+			}
+		} else {
+			$fields = $this->obj_fields;
+		}
+		return new \WP_CLI\Formatter( $assoc_args, $fields, $this->obj_type );
+	}
 
 }
 
