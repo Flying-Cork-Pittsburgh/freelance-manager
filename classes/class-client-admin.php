@@ -270,43 +270,48 @@ class Client_Admin  {
 	public function save_overview_meta_box( $post_id ) {
 		$post = get_post($post_id);
 		$data = array();
-		$data['location'] = '';
-		$data['website'] = '';
-		$data['phone'] = '';
-		$data['person'] = '';
-		$data['email'] = '';
-		$data['sha1'] = '';
+
+		$location_id        = $this->get_field( 'location' );
+		$website_id         = $this->get_field( 'website' );
+		$phone_id           = $this->get_field( 'phone' );
+		$sha1_id            = $this->get_field( 'sha' );
+		$contact_person_id  = $this->get_field( 'contact_name' );
+		$contact_email_id   = $this->get_field( 'contact_email' );
+
 
 		/* OK, its safe for us to save the data now. */
 
-		if ( isset( $_POST['_client_location'] ) ){
-			$data['location'] = sanitize_text_field( $_POST['_client_location'] );
-		}
-		if ( isset( $_POST['_client_website']) ){
-			$data['website']  = sanitize_text_field( $_POST['_client_website'] );
-		}
-		if ( isset($_POST['_client_phone']) ) {
-			$data['phone']    = sanitize_text_field( $_POST['_client_phone'] );
+		if ( isset( $_POST[ $location_id ] ) ){
+			$data['location'] = sanitize_text_field( $_POST[ $location_id ] );
 		}
 
-		if ( isset($_POST['_client_contact_person']) ) {
-			$data['person'] = sanitize_text_field( $_POST['_client_contact_person'] );
+		if ( isset( $_POST[ $website_id ]) ){
+			$data['website'] = sanitize_text_field( $_POST[ $website_id ] );
 		}
 
-		if ( isset($_POST['_client_contact_email']) ) {
-			$data['email'] = sanitize_text_field( $_POST['_client_contact_email'] );
+		if ( isset($_POST[ $phone_id ]) ) {
+			$data['phone'] = sanitize_text_field( $_POST[ $phone_id ] );
 		}
 
-		if ( $post_id && $post->post_title &&
-			$data['website'] && $data['person'] && $data['email'] ) {
+		if ( isset($_POST[ $contact_name_id ]) ) {
+			$data['person'] = sanitize_text_field( $_POST[ $contact_name_id ] );
+		}
 
-			$data['sha1'] = $this->create_sha(
-				$post_id,
-				$post->post_title,
-				$data['website'],
-				$data['person'],
-				$data['email']
-			);
+		if ( isset($_POST[ $contact_email ]) ) {
+			$data['email'] = sanitize_text_field( $_POST[ $contact_email_id ] );
+		}
+
+		if ( $post_id && isset( $data['website'] ) || isset( $data['person'] ) || isset( $data['email'] ) ) {
+			$website = get_post_meta( $post_id, $website_id, $single );
+			$phone   = get_post_meta( $post_id, $phone_id, $single );
+			$sha1    = get_post_meta( $post_id, $sha1_id, $single );
+
+			$website = ( isset( $data['website'] ) ) ? $data['website'] : $website;
+			$phone   = ( isset( $data['phone'] ) )   ? $data['phone']   : $phone ;
+			$email   = ( isset( $data['email'] ) )   ? $data['email']   : $email ;
+
+
+			$data[ $sha1_id ] = $this->create_sha( $post_id, $website, $person, $email );
 		}
 
 		$this->update_meta( $post_id, $data );
@@ -319,14 +324,13 @@ class Client_Admin  {
 	 * These fields are use to prevent guessability and ensure uniqueness across clients
 	 *
 	 * @param int $post_id
-	 * @param string $post_title
 	 * @param string $website
 	 * @param string $person
 	 * @param string $email
 	 * @return string
 	 */
-	public function create_sha( $post_id, $post_title, $website, $person, $email ){
-		$value = $post_id . $post_title . $website . $person . $email;
+	public function create_sha( $post_id, $website, $person, $email ){
+		$value = $post_id . $website . $person . $email;
 		return sha1( $value );
 	}
 
