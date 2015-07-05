@@ -363,15 +363,18 @@ class Client_Admin  {
 	 * @param array $data
 	 * @return void
 	 */
-	public function delete_meta( $post_id ) {
+	public function delete_meta( $post_id, $data ) {
+		$deleted = 0;
 
-		delete_post_meta( $post_id, '_client_location' );
-		delete_post_meta( $post_id, '_client_website' );
-		delete_post_meta( $post_id, '_client_phone' );
-		delete_post_meta( $post_id, '_client_contact_person' );
-		delete_post_meta( $post_id, '_client_contact_email' );
-		delete_post_meta( $post_id, '_client_sha1' );
+		foreach ( $data AS $field => $value ) {
+			$field_id = $this->get_field( $field );
+			$res = delete_post_meta( $post_id, $field_id );
+			if ( $res ) {
+				$deleted++;
+			}
+		}
 
+		return $deleted;
 	}
 }
 
