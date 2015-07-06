@@ -2,7 +2,7 @@
 
 class ClientAdminTest extends WP_UnitTestCase {
 
-	function test_column_data() {
+	function test_columns_data() {
 		$data = [
 			'first' => 'First',
 			'second' => 'Second',
