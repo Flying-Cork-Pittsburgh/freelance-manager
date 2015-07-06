@@ -23,6 +23,11 @@ class Client_Admin  {
 	public function __construct() {
 	}
 
+	/**
+	 * Tell WordPress to add actions and filters in this class
+	 *
+	 * @return void
+	 */
 	public function init() {
 		add_action( 'manage_client_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
@@ -31,6 +36,14 @@ class Client_Admin  {
 	}
 
 
+	/**
+	 * Retrieve the meta field ID for a given name.
+	 *
+	 * Allows you to use English names ro retrieve is associated id, which aren't as easy to remember
+	 *
+	 * @param string $field the english name of the field
+	 * @return string|bool
+	 */
 	public function get_field( $field ) {
 		switch ( $field ) {
 		case 'location':
@@ -55,7 +68,6 @@ class Client_Admin  {
 			return false;
 			break;
 		}
-
 	}
 
 	/**
@@ -79,7 +91,6 @@ class Client_Admin  {
 
 		$single = true;
 
-
 		if ( 'thumbnail' == $column_name ) {
 			$default_thumbnail = 'default.png';
 			$default_image = plugin_dir_url( dirname( __FILE__ ) ) . $default_thumbnail;
@@ -101,7 +112,6 @@ class Client_Admin  {
 
 			echo '<a href="' . $url . '">' . $url . '</a>';
 		}
-
 	}
 
 
@@ -138,7 +148,7 @@ class Client_Admin  {
 
 
 	/**
-	 * Add an 'Overview' meta box to the post
+	 * Add an 'Overview' meta box to the post and define the callback
 	 *
 	 *
 	 * @since 0.1
@@ -165,29 +175,23 @@ class Client_Admin  {
 	public function overview_callback( $post ) {
 		$post_id = $post->ID;
 
-		$location_id = $this->get_field( 'location' );
-		$website_id  = $this->get_field( 'website' );
-		$phone_id    = $this->get_field( 'phone' );
-		$sha1_id     = $this->get_field( 'sha' );
-
+		$location_id        = $this->get_field( 'location' );
+		$website_id         = $this->get_field( 'website' );
+		$phone_id           = $this->get_field( 'phone' );
+		$sha1_id            = $this->get_field( 'sha' );
 		$contact_person_id  = $this->get_field('contact_name');
 		$contact_email_id   = $this->get_field('contact_email');
 
-
 		$single = true;
 
-		$location = get_post_meta( $post_id, $location_id, $single );
-		$website  = get_post_meta( $post_id, $website_id, $single );
-		$phone    = get_post_meta( $post_id, $phone_id, $single );
-		$sha1     = get_post_meta( $post_id, $sha1_id, $single );
-
+		$location       = get_post_meta( $post_id, $location_id, $single );
+		$website        = get_post_meta( $post_id, $website_id, $single );
+		$phone          = get_post_meta( $post_id, $phone_id, $single );
+		$sha1           = get_post_meta( $post_id, $sha1_id, $single );
 		$contact_person = get_post_meta( $post_id, $contact_person_id, $single );
 		$contact_email  = get_post_meta( $post_id, $contact_email_id, $single );
 
-		error_log( 'location_id=' . $location_id . ' location=' . $location );
-
 		wp_nonce_field( 'fremgr_client_meta_box',  '_fremgr_client_overview_meta_box_nonce' );
-
 		?>
 		<table class="form-table">
 		<tr>
@@ -279,8 +283,6 @@ class Client_Admin  {
 		$contact_email_id   = $this->get_field( 'contact_email' );
 
 
-		/* OK, its safe for us to save the data now. */
-
 		if ( isset( $_POST[ $location_id ] ) ){
 			$data['location'] = sanitize_text_field( $_POST[ $location_id ] );
 		}
@@ -310,7 +312,6 @@ class Client_Admin  {
 			$phone   = ( isset( $data['phone'] ) )   ? $data['phone']   : $phone ;
 			$email   = ( isset( $data['email'] ) )   ? $data['email']   : $email ;
 
-
 			$data[ $sha1_id ] = $this->create_sha( $post_id, $website, $person, $email );
 		}
 
@@ -320,7 +321,7 @@ class Client_Admin  {
 	/**
 	 * Create a SHA1 string to uniquely identify the client
 	 *
-	 * Describe your function The sha1 isn't controlled by the user. It's generated for them.
+	 * The sha1 isn't controlled by the user. It's generated for them.
 	 * These fields are use to prevent guessability and ensure uniqueness across clients
 	 *
 	 * @param int $post_id
