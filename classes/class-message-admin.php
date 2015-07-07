@@ -36,6 +36,14 @@ class Message_Admin  {
 
 	}
 
+	/**
+	 * Load Actions and Filters
+	 *
+	 * @uses add_action
+	 * @uses add_filter
+	 *
+	 * @return void
+	 */
 	public function init() {
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
@@ -74,6 +82,14 @@ class Message_Admin  {
 
 	}
 
+	/**
+	 * Retreieve a list of Client and save them to this object
+	 *
+	 * @uses WP_Query
+	 *
+	 * @param String optional $two an optional value
+	 * @return void
+	 */
 	public function get_clients() {
 
 		if ( ! $this->clients ) {
@@ -331,6 +347,12 @@ class Message_Admin  {
 
 	}
 
+	/**
+	 * Retrieve the Status text for a given code.
+	 *
+	 * @param string $code a status code
+	 * @return string
+	 */
 	public function get_status( $code ) {
 		if ( empty( $code ) ) {
 			$code = $this->status_default;
