@@ -377,10 +377,8 @@ class Message_Admin  {
 	 */
 	public function status_update() {
 
-		error_log( ' status_update _POST=' . print_r( $_POST, true ) );
 
 		if ( isset( $_POST["action"] ) ) {
-		error_log( ' status_update has action' );
 			$data = array();
 			$data['action']        = wp_kses_data( $_POST['action'] );
 			$data['id']            = intval( $_POST['id'] );
@@ -392,10 +390,9 @@ class Message_Admin  {
 			update_post_meta( $data['id'], $this->status, $this->statuses['sent'], $this->statuses['not_sent'] );
 
 			status_header( 200 );
-			wp_send_json_success( $_POST );
+			wp_send_json_success( $data );
 			wp_die();
 		} else {
-			error_log( ' status_update has NO action' );
 			status_header( 412 );
 			wp_send_json_error( "action parameter not specified" );
 			wp_die();
