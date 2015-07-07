@@ -40,7 +40,8 @@ class Message_Admin  {
 		add_action( 'add_meta_boxes', array( $this, 'overview_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_overview_meta_box' ) );
 		add_action( 'manage_message_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
-        add_action( 'wp_ajax_message_send', array( $this, 'message_send' ) );
+		add_action( 'wp_ajax_message_send', array( $this, 'message_send' ) );
+		add_action( 'wp_ajax_nopriv_status_update', array( $this, 'status_update' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'ajax_js' ) );
 
 		add_filter( 'manage_message_posts_columns', array( $this, 'columns_headings' ) );
@@ -108,6 +109,7 @@ class Message_Admin  {
 		$client_id = get_post_meta( $post_id, $this->client_id, $single );
 		$subject = get_post_meta( $post_id, $this->subject, $single );
 		$status = get_post_meta( $post_id, $this->status, $single );
+		$status = $this->get_status( $status );
 		$sha1 = sha1( 'Hello World' );
 
 		wp_nonce_field( 'fremgr_message_meta_box',  '_fremgr_message_overview_meta_box_nonce' );
@@ -141,10 +143,7 @@ class Message_Admin  {
 		<td>
 			<label for="<?php echo $this->status; ?>"><?php _e( 'Status', 'fremgr' );  ?></label>
 		</td>
-		<td><?php
-			$status = ( $status ) ? $status : $this->status_default;
-			$status_text = $this->statuses[ $status ];
-			echo $status_text; ?>
+		<td><?php echo $status; ?>
 		</td>
 		</tr>
 
@@ -247,10 +246,7 @@ class Message_Admin  {
 
 		} else if ( 'message_status' == $column_name ) {
 			$code = get_post_meta( $post_id, $this->status, $single );
-			if ( empty( $code ) ) {
-				$code = $this->status_default;
-			}
-			echo $this->statuses[ $code ];
+			echo $this->get_status( $code );
 
 		} else if ( 'message_actions' == $column_name ) {
 
@@ -334,4 +330,55 @@ class Message_Admin  {
 		}
 
 	}
+
+	public function get_status( $code ) {
+		if ( empty( $code ) ) {
+			$code = $this->status_default;
+		}
+
+		if ( isset( $this->statuses[ $code ] ) ) {
+			$status = $this->statuses[ $code ];
+		} else {
+			$status = $code;
+		}
+
+		return $status;
+	}
+
+
+	/**
+	 *  Handle the AJAX request to update status
+	 *
+	 * @param String $one a necessary parameter
+	 * @param String optional $two an optional value
+	 * @return void
+	 */
+	public function status_update() {
+
+		error_log( ' status_update _POST=' . print_r( $_POST, true ) );
+
+		if ( isset( $_POST["action"] ) ) {
+		error_log( ' status_update has action' );
+			$data = array();
+			$data['action']        = wp_kses_data( $_POST['action'] );
+			$data['id']            = intval( $_POST['id'] );
+			$data['message']       = wp_kses_data( $_POST['message'] );
+			$data['status']        = wp_kses_data( $_POST['status'] );
+			$data['client_sha']    = wp_kses_data( $_POST['client_sha'] );
+			$data['manager_sha']   = wp_kses_data( $_POST['manager_sha'] );
+
+			update_post_meta( $data['id'], $this->status, $this->statuses['sent'], $this->statuses['not_sent'] );
+
+			status_header( 200 );
+			wp_send_json_success( $_POST );
+			wp_die();
+		} else {
+			error_log( ' status_update has NO action' );
+			status_header( 412 );
+			wp_send_json_error( "action parameter not specified" );
+			wp_die();
+
+		}
+	}
+
 }

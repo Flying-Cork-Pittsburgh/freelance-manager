@@ -295,11 +295,11 @@ class Client_Admin  {
 			$data['phone'] = sanitize_text_field( $_POST[ $phone_id ] );
 		}
 
-		if ( isset($_POST[ $contact_name_id ]) ) {
-			$data['person'] = sanitize_text_field( $_POST[ $contact_name_id ] );
+		if ( isset($_POST[ $contact_person_id ]) ) {
+			$data['person'] = sanitize_text_field( $_POST[ $contact_person_id ] );
 		}
 
-		if ( isset($_POST[ $contact_email ]) ) {
+		if ( isset($_POST[ $contact_email_id ]) ) {
 			$data['email'] = sanitize_text_field( $_POST[ $contact_email_id ] );
 		}
 
@@ -381,6 +381,8 @@ class Client_Admin  {
 
 		return $deleted;
 	}
+
+
 }
 
 
