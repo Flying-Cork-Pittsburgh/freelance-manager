@@ -74,7 +74,7 @@ class Message_Admin  {
 	 *
 	 * @return void
 	 */
-	 public function overview_meta_box() {
+	public function overview_meta_box() {
 
 		$title = __('Overview');
 		$callback = 'overview_callback';
@@ -294,6 +294,7 @@ class Message_Admin  {
 	* site using the Freelance Site
 	* @return void
 	*/
+
 	public function message_send() {
 		$website = strip_tags( $_POST['website'] );
 		$id      = intval( $_POST['id'] );
@@ -306,18 +307,18 @@ class Message_Admin  {
 		//
 		$query_args = 'p=' . $id. '&post_type=message';
 		$query2 = new WP_Query( $query_args );
-		$content = '';
 
 		if ( $query2->have_posts() ) {
 			while ( $query2->have_posts() ) {
 				$query2->the_post();
-				$content = get_the_content();
+				$message = new Message( get_the_title(), get_the_content() );
 			}
 		} else {
 			$data = array('message' => 'There are no posts for this ID');
 
 			wp_send_json_error( $data );
 		}
+		$message->set_id( $id );
 
 		// Restore original Post Data
 		wp_reset_postdata();
@@ -325,7 +326,7 @@ class Message_Admin  {
 		$data = array(
 			'action' => 'new_message',
 			'id' => $id,
-			'message' => $content,
+			'message' => $message->get(),
 			'client_sha' => 'd2a04d71301a8915217dd5faf81d12cffd6cd958',
 			'manager_sha' => 'f2e048910a8c617d70ccac9d60cca84c77a960c09'
 		);
@@ -387,7 +388,8 @@ class Message_Admin  {
 			$data['client_sha']    = wp_kses_data( $_POST['client_sha'] );
 			$data['manager_sha']   = wp_kses_data( $_POST['manager_sha'] );
 
-			update_post_meta( $data['id'], $this->status, $this->statuses['sent'], $this->statuses['not_sent'] );
+			$message = new Message();
+			update_post_meta( $data['id'], $this->status, $message::SENT, $message::NOT_SENT );
 
 			status_header( 200 );
 			wp_send_json_success( $data );
