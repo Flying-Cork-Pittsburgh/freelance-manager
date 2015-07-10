@@ -18,6 +18,7 @@ class Message
 	protected $date_updated = '';
 	protected $status = '';
 	protected $statuses = [];
+	protected $id = '';
 
 	protected $default_status = self::NOT_READ;
 
@@ -75,6 +76,22 @@ class Message
 		$this->status = $status;
 	}
 
+	// ID Field
+	public function get_id(){
+		return $this->id;
+	}
 
+	public function set_id( $id ){
+		$this->id = $id;
+	}
+
+	public function get() {
+		return array(
+			'id' => $this->get_id(),
+			'subject' => $this->get_subject(),
+			'content' => $this->get_content(),
+			'date' => date('c'),
+		);
+	}
 }
 
