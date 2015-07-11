@@ -280,6 +280,7 @@ class Message_Admin  {
 				$data_attrs .= ' data-id="' . $post_id . '" ';
 				$data_attrs .= ' data-action="' . $action . '" ';
 				$data_attrs .= ' data-website="' . $website . '" ';
+				$data_attrs .= ' data-client-id="' . $client_id . '" ';
 
 				echo '<button ' . $data_attrs . ' class="message_send">Send</button>';
 			}
@@ -296,8 +297,9 @@ class Message_Admin  {
 	*/
 
 	public function message_send() {
-		$website = strip_tags( $_POST['website'] );
-		$id      = intval( $_POST['id'] );
+		$website      = strip_tags( $_POST['website'] );
+		$post_id      = intval( $_POST['id'] );
+		$client_id    = intval( $_POST['client_id'] );
 
 		$url = $website . '/wp-admin/admin-ajax.php';
 
@@ -305,7 +307,7 @@ class Message_Admin  {
 		//
 		// Look up the message content for this $id
 		//
-		$query_args = 'p=' . $id. '&post_type=message';
+		$query_args = 'p=' . $post_id. '&post_type=message';
 		$query2 = new WP_Query( $query_args );
 
 		if ( $query2->have_posts() ) {
@@ -325,10 +327,10 @@ class Message_Admin  {
 
 		$data = array(
 			'action' => 'new_message',
-			'id' => $id,
+			'id' => $post_id,
 			'message' => $message->get(),
-			'client_sha' => 'd2a04d71301a8915217dd5faf81d12cffd6cd958',
-			'manager_sha' => 'f2e048910a8c617d70ccac9d60cca84c77a960c09'
+			'client_sha' => $client_sha,
+			'manager_sha' => FREMGR_MANAGER_ID
 		);
 
 		$args = array();

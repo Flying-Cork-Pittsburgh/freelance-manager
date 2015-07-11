@@ -31,6 +31,7 @@ jQuery( document ).ready(function($) {
 		postData.id = $(this).attr('data-id');
 		postData.action = $(this).attr('data-action');
 		postData.website = $(this).attr('data-website');
+		postData.client_id = $(this).attr('data-client-id');
 
 		console.log('send a message to: ' + ajaxurl  );
 		console.dir(postData);
