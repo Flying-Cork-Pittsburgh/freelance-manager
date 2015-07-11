@@ -320,7 +320,18 @@ class Message_Admin  {
 
 			wp_send_json_error( $data );
 		}
-		$message->set_id( $id );
+		$single = true;
+
+		$subject = get_post_meta( $post_id, $this->subject, $single );
+
+		$client_admin = new Client_Admin();
+		$client_sha = get_post_meta( $client_id, $client_admin->get_field( 'sha' ), $single );
+
+		if ( ! $subject ) {
+			$message->set_subject( $subject );
+		}
+
+		$message->set_id( $post_id );
 
 		// Restore original Post Data
 		wp_reset_postdata();
