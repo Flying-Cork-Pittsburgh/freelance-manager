@@ -200,7 +200,7 @@ class Client_Admin  {
 		</td>
 		<td>
 			<strong id="<?php echo $sha1_id;  ?>"><?php
-			echo ( $sha1 ) ? $sha1 : '';
+			echo ( isset( $sha1 ) ) ? $sha1 : '';
 			?></strong>
 		</td>
 		</tr>
@@ -282,6 +282,7 @@ class Client_Admin  {
 		$contact_person_id  = $this->get_field( 'contact_name' );
 		$contact_email_id   = $this->get_field( 'contact_email' );
 
+		$single = true;
 
 		if ( isset( $_POST[ $location_id ] ) ){
 			$data['location'] = sanitize_text_field( $_POST[ $location_id ] );
@@ -296,23 +297,23 @@ class Client_Admin  {
 		}
 
 		if ( isset($_POST[ $contact_person_id ]) ) {
-			$data['person'] = sanitize_text_field( $_POST[ $contact_person_id ] );
+			$data['contact_name'] = sanitize_text_field( $_POST[ $contact_person_id ] );
 		}
 
 		if ( isset($_POST[ $contact_email_id ]) ) {
-			$data['email'] = sanitize_text_field( $_POST[ $contact_email_id ] );
+			$data['contact_email'] = sanitize_text_field( $_POST[ $contact_email_id ] );
 		}
 
 		if ( $post_id && isset( $data['website'] ) || isset( $data['person'] ) || isset( $data['email'] ) ) {
 			$website = get_post_meta( $post_id, $website_id, $single );
-			$phone   = get_post_meta( $post_id, $phone_id, $single );
+			$person  = get_post_meta( $post_id, $contact_person_id, $single );
 			$sha1    = get_post_meta( $post_id, $sha1_id, $single );
 
 			$website = ( isset( $data['website'] ) ) ? $data['website'] : $website;
-			$phone   = ( isset( $data['phone'] ) )   ? $data['phone']   : $phone ;
-			$email   = ( isset( $data['email'] ) )   ? $data['email']   : $email ;
+			$person  = ( isset( $data['contact_name'] ) )  ? $data['contact_name']  : $person ;
+			$email   = ( isset( $data['contact_email'] ) )   ? $data['contact_email']   : $email ;
 
-			$data[ $sha1_id ] = $this->create_sha( $post_id, $website, $person, $email );
+			$data['sha'] = $this->create_sha( $post_id, $website, $person, $email );
 		}
 
 		$this->update_meta( $post_id, $data );
