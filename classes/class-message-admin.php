@@ -20,7 +20,6 @@ class Message_Admin  {
 	private $status      = '_message_status';
 	private $actions     = '_message_actions';
 	private $clients     = [];
-	private $statuses    = [];
 
 	/**
 	 * Constructor
@@ -31,8 +30,6 @@ class Message_Admin  {
 	 *
 	 */
 	public function __construct() {
-		$this->statuses['not_sent'] = __( 'Not Sent' );
-		$this->statuses['sent'] = __( 'Sent' );
 
 	}
 
@@ -367,15 +364,17 @@ class Message_Admin  {
 	 * @param string $code a status code
 	 * @return string
 	 */
-	public function get_status( $code ) {
+	public function get_status( $code = '' ) {
 		if ( empty( $code ) ) {
 			$code = $this->status_default;
 		}
 
-		if ( isset( $this->statuses[ $code ] ) ) {
-			$status = $this->statuses[ $code ];
-		} else {
+		$status = new Status();
+
+		if ( $status->is_valid( $code )  ) {
 			$status = $code;
+		} else {
+			$status = $this->status_default;
 		}
 
 		return $status;

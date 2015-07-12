@@ -7,33 +7,27 @@
  */
 class Message
 {
-	const SENT     = 'sent';
-	const NOT_SENT = 'not_sent';
-	const READ     = 'read';
-	const NOT_READ = 'not_read';
 
 	protected $subject = '';
 	protected $content = '';
 	protected $date_created = '';
 	protected $date_updated = '';
+	protected $statuses = '';
 	protected $status = '';
-	protected $statuses = [];
 	protected $id = '';
 
-	protected $default_status = self::NOT_READ;
+	protected $default_status = '';
 
 
 	public function __construct( $subject, $content, $status = '' ) {
 
-		$this->statuses[ self::SENT ] = __( 'Sent', 'fremgr');
-		$this->statuses[ self::NOT_SENT ] = __( 'Not Sent', 'fremgr');
-		$this->statuses[ self::READ ] = __( 'Read', 'fremgr');
-		$this->statuses[ self::NOT_READ ] = __( 'Not Read', 'fremgr');
+		$this->statuses = new Status();
+		$this->default_status = Status::NOT_READ;
 
 		$this->subject = $subject;
 		$this->content = $content;
 
-		$this->status = ( $status && isset( $this->statuses[ $status ]) ) ? $status : $this->default_status;
+		$this->status = ( $this->statuses->is_valid( $status )  ) ? $status : $this->default_status;
 	}
 
 	// Content Field
@@ -73,7 +67,11 @@ class Message
 	}
 
 	public function set_status( $status ){
-		$this->status = $status;
+		if ( $this->statuses->is_valid( $status )  ) {
+			$this->status = $status;
+		} else {
+			$this->status = $this->default_status;
+		}
 	}
 
 	// ID Field
@@ -91,7 +89,9 @@ class Message
 			'subject' => $this->get_subject(),
 			'content' => $this->get_content(),
 			'date' => date('c'),
+			'time' => date('U'),
 		);
 	}
+
 }
 
