@@ -29,25 +29,25 @@ class MessageTest extends WP_UnitTestCase {
 
 		$this->assertEquals( 'not_read' , $message->get_status() );
 
-		$message->set_status( $message::READ );
+		$message->set_status( Status::READ );
 		$this->assertEquals( 'read' , $message->get_status() );
 
-		$message->set_status( $message::NOT_READ );
+		$message->set_status( Status::NOT_READ );
 		$this->assertEquals( 'not_read' , $message->get_status() );
 
-		$message->set_status( $message::SENT );
+		$message->set_status( Status::SENT );
 		$this->assertEquals( 'sent' , $message->get_status() );
 
-		$message->set_status( $message::NOT_SENT );
+		$message->set_status( Status::NOT_SENT );
 		$this->assertEquals( 'not_sent' , $message->get_status() );
 
 
 		$message_with_status = new Message( $subject, $content, 'sent' );
-		$this->assertEquals( $message_with_status::SENT , $message_with_status->get_status() );
+		$this->assertEquals( Status::SENT , $message_with_status->get_status() );
 
-		$this->assertNotEquals( $message_with_status::NOT_SENT , $message_with_status->get_status() );
-		$this->assertNotEquals( $message_with_status::READ , $message_with_status->get_status() );
-		$this->assertNotEquals( $message_with_status::NOT_READ , $message_with_status->get_status() );
+		$this->assertNotEquals( Status::NOT_SENT , $message_with_status->get_status() );
+		$this->assertNotEquals( Status::READ , $message_with_status->get_status() );
+		$this->assertNotEquals( Status::NOT_READ , $message_with_status->get_status() );
 	}
 
 }
