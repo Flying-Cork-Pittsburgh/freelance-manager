@@ -1,10 +1,10 @@
 <?php
 
 
-add_action( 'init', 'client_init' );
-add_filter( 'post_updated_messages', 'client_updated_messages' );
+add_action( 'init', 'fremgr_client_init' );
+add_filter( 'post_updated_messages', 'fremgr_client_updated_messages' );
 
-function client_init() {
+function fremgr_client_init() {
 	register_post_type( 'client', array(
 		'labels'            => array(
 			'name'                => __( 'Clients', 'fremgr' ),
@@ -33,7 +33,7 @@ function client_init() {
 
 }
 
-function client_updated_messages( $messages ) {
+function fremgr_client_updated_messages( $messages ) {
 	global $post;
 
 	$permalink = get_permalink( $post );

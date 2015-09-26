@@ -1,6 +1,6 @@
 <?php
 
-function message_init() {
+function fremgr_message_init() {
 	register_post_type( 'message', array(
 		'labels'            => array(
 			'name'                => __( 'Messages', 'fremgr' ),
@@ -28,9 +28,9 @@ function message_init() {
 	) );
 
 }
-add_action( 'init', 'message_init' );
+add_action( 'init', 'fremgr_message_init' );
 
-function message_updated_messages( $messages ) {
+function fremgr_message_updated_messages( $messages ) {
 	global $post;
 
 	$permalink = get_permalink( $post );
@@ -54,4 +54,4 @@ function message_updated_messages( $messages ) {
 
 	return $messages;
 }
-add_filter( 'post_updated_messages', 'message_updated_messages' );
+add_filter( 'post_updated_messages', 'fremgr_message_updated_messages' );
